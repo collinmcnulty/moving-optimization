@@ -8,7 +8,7 @@ Created on Sat Dec 10 10:54:30 2016
 import scipy.optimize as optimize
 import numpy as np
 import pandas as pd
-
+from input_def import Input 
 
 def calculate_commute(move_date):
     days = 183 - move_date
@@ -19,11 +19,13 @@ def calculate_commute(move_date):
     
     #TODO make commute times a probability distribution
     
-
+def check_input_obj_type(input):
+    if not isinstance(input, Input):
+        input = convert_input_to_obj(input) 
+    return input
 
 def find_money_lost(input):
-    if type(input) == np.ndarray:
-        input = convert_input_to_obj(input)    
+    input = check_input_obj_type(input)
     money = (input.EL*input.const_max_rent + 
     input.AR*input.const_max_rent*.85 +  
     input.const_new_rent * input.SL)
@@ -31,8 +33,7 @@ def find_money_lost(input):
     return money
             
 def find_time_spent(input):
-    if type(input) == np.ndarray:
-        input = convert_input_to_obj(input)
+    input = check_input_obj_type(input)
     time = input.moving_time - calculate_commute(input.moving_time)
     return time
     
@@ -45,17 +46,9 @@ def calculate_objective(input):
     return objective
     
 def convert_input_to_obj(input_array):
-    return input(input_array)
+    return Input(input_array)
 
-class input:
-    def __init__(self, list): 
-        self.EL= list[0]
-        self.SL = list[1]
-        self.moving_time = list[2]
-        self.AR = 45
-        self.nparray=np.array([self.EL, self.SL, self.moving_time])
-        self.const_max_rent=1600
-        self.const_new_rent = 825
+
 
 def print_results(res):
     print(res.x)
@@ -64,7 +57,7 @@ def print_results(res):
 
 
 if __name__=="__main__":
-    input_initial = input([80, 60, 70])
+    input_initial = Input([80, 60, 70])
     cons = ({'type':'ineq',
              'fun' : lambda x: np.array([x[0]-x[1]]),
              },
