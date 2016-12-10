@@ -6,6 +6,7 @@ Created on Sat Dec 10 14:00:52 2016
 """
 import numpy as np
 
+
 class Input:
     def __init__(self, list): 
         self.EL= list[0]
@@ -30,6 +31,9 @@ class Input:
         # TODO make this reflect actual weekdays
 
         # TODO make commute times a probability distribut
+
+
+
     def find_time_spent(self):
         
         self.time = self.moving_time - calculate_commute(self.moving_time)
