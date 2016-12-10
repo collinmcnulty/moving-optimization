@@ -21,8 +21,16 @@ class Input:
         input.AR*input.const_max_rent*.85 +  
         input.const_new_rent * input.SL)
         return self.money
+
+    def calculate_commute(move_date):
+        days = 183 - move_date
+        time_per_day = (20 * 7 + 25 + 25) / 7
+        time = days * time_per_day
+        return time
+        # TODO make this reflect actual weekdays
+
+        # TODO make commute times a probability distribut
+    def find_time_spent(self):
         
-    def find_time_spent(input):
-        
-        self.time = input.moving_time - calculate_commute(input.moving_time)
+        self.time = self.moving_time - calculate_commute(self.moving_time)
         return self.time
