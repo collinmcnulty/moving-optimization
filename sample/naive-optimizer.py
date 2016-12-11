@@ -5,10 +5,10 @@ Created on Sat Dec 10 10:54:30 2016
 @author: Collin
 """
 
-import scipy.optimize as optimize
 import numpy as np
-import pandas as pd
-from input_def import Input
+import scipy.optimize as optimize
+
+from sample.input_def import MoveStrategy
 
 
 def calculate_commute(move_date):
@@ -22,7 +22,7 @@ def calculate_commute(move_date):
 
 
 def check_input_obj_type(input):
-    if not isinstance(input, Input):
+    if not isinstance(input, MoveStrategy):
         input = convert_input_to_obj(input)
     return input
 
@@ -52,7 +52,7 @@ def calculate_objective(input):
 
 
 def convert_input_to_obj(input_array):
-    return Input(input_array)
+    return MoveStrategy(input_array)
 
 
 def print_results(res):
@@ -62,7 +62,7 @@ def print_results(res):
 
 
 if __name__ == "__main__":
-    input_initial = Input([80, 60, 70])
+    input_initial = MoveStrategy([80, 60, 70])
     cons = ({'type': 'ineq',
              'fun': lambda x: np.array([x[0] - x[1]]),
              },

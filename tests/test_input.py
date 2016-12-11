@@ -1,10 +1,11 @@
 from unittest import TestCase
-from input_def import Input
+
+from sample.input_def import MoveStrategy
 
 
 class TestInput(TestCase):
     def test_find_money_lost(self):
-        a = Input([40, 20, 30])
+        a = MoveStrategy([40, 20, 30])
         self.assertEqual(2, 2)
 
     def test_calculate_commute(self):
