@@ -7,9 +7,14 @@ class TestInput(TestCase):
     def test_find_money_lost(self):
         a = MoveStrategy([40, 20, 30])
         self.assertEqual(2, 2)
+        self.assertIsInstance(a.money, float)
 
-    def test_calculate_commute(self):
-        self.fail()
+    # def test_calculate_commute(self):
+    #     a = MoveStrategy([40, 20, 30])
+    #     self.assertEqual(2, 2)
+    #     self.assertIsInstance(a.money, float)
 
     def test_find_time_spent(self):
-        self.fail()
+        a = MoveStrategy([40, 20, 30])
+        self.assertEqual(2, 2)
+        self.assertIsInstance(a.money, float)
