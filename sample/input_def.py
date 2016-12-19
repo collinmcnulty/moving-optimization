@@ -27,7 +27,7 @@ class MoveStrategy:
     def find_money_lost(self):
         self.money = (self.EL*self.const_max_rent +
         self.AR*self.const_max_rent*.85 +
-        self.const_new_rent * (200-self.SL))
+        self.const_new_rent * (183-self.SL))
         return self.money
 
     @staticmethod
@@ -41,7 +41,7 @@ class MoveStrategy:
         # TODO make commute times a probability distribution
 
     def find_time_spent(self):
-        self.time = self.moving_time - self.calculate_commute(self.moving_time)
+        self.time =  -self.calculate_commute(self.moving_time)
         return self.time
 
     def calculate_objective_value(self):
@@ -53,3 +53,16 @@ class MoveStrategy:
         # Minimize time spent/money saved
          objective = self.time / self.money
          return objective
+
+    def print_results(self):
+        print("Days until lease end: {:.0f}".format(self.EL)),
+        print("Days until new lease: {:.0f}".format(self.SL))
+        print("Days until move: {:.0f}".format(self.moving_time))
+        print("Time Spent: {:.2f}".format(self.time))
+        print("Money Spent: {:.2f}".format(self.money))
+        print("Time/Money: {:.2f}".format(self.time/self.money))
+
+if __name__ == "__main__":
+    input_initial = [183, 183, 183]
+    a = MoveStrategy(input_initial)
+    a.print_results()
