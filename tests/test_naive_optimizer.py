@@ -7,5 +7,5 @@ class TestInput(TestCase):
     def test_objective(self):
         input = [20,30,40]
         a=MoveStrategy(input)
-        b=Optimizer()
+        b=Optimizer(input)
         self.assertEqual(Optimizer.objective(input), a.objective_value)
