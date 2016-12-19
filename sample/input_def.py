@@ -8,7 +8,7 @@ import numpy as np
 
 
 class MoveStrategy:
-    def __init__(self, list): 
+    def __init__(self, list, obj='tr'):
         self.EL= list[0]
         self.SL = list[1]
         self.moving_time = list[2]
@@ -16,7 +16,10 @@ class MoveStrategy:
         self.nparray=np.array([self.EL, self.SL, self.moving_time])
         self.const_max_rent=1600
         self.const_new_rent = 825
-        self.objective_function = self.time_ratio
+        if obj == 'tr':
+            self.objective_function = self.time_ratio
+        elif obj == 'time':
+            self.objective_function = self.find_time_spent
         self.find_time_spent()
         self.find_money_lost()
         self.calculate_objective_value()
@@ -42,11 +45,11 @@ class MoveStrategy:
         return self.time
 
     def calculate_objective_value(self):
-        self.objective_value = self.objective_function(self.time, self.money)
+        self.objective_value = self.objective_function()
         return self.objective_value
 
-    @staticmethod
-    def time_ratio(time, money):
+
+    def time_ratio(self):
         # Minimize time spent/money saved
-        objective = time / money
+        objective = self.time / self.money
         return objective

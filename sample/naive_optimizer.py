@@ -16,8 +16,8 @@ class Optimizer:
         point = MoveStrategy(input_list)
         return point.objective_value
 
-    def __init__(self, list):
-        self.initial_point = MoveStrategy(list)
+    def __init__(self, list, obj='tr'):
+        self.initial_point = MoveStrategy(list, obj)
         self.cons = (
             {'type': 'ineq',
              'fun': lambda x: np.array([x[0] - x[1]]),
