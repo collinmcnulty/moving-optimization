@@ -14,8 +14,8 @@ class MoveStrategy:
         self.moving_time = list[2]
         self.AR = 45
         self.nparray=np.array([self.EL, self.SL, self.moving_time])
-        self.const_max_rent=1600
-        self.const_new_rent = 825
+        self.const_max_rent=1600/30
+        self.const_new_rent = 825/30
         if obj == 'tr':
             self.objective_function = self.time_ratio
         elif obj == 'time':
@@ -27,7 +27,7 @@ class MoveStrategy:
     def find_money_lost(self):
         self.money = (self.EL*self.const_max_rent +
         self.AR*self.const_max_rent*.85 +
-        self.const_new_rent * self.SL)
+        self.const_new_rent * (200-self.SL))
         return self.money
 
     @staticmethod
@@ -51,5 +51,5 @@ class MoveStrategy:
 
     def time_ratio(self):
         # Minimize time spent/money saved
-        objective = self.time / self.money
-        return objective
+         objective = self.time / self.money
+         return objective

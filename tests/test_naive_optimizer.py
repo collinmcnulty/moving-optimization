@@ -13,5 +13,5 @@ class TestInput(TestCase):
     def test_objective_options(self):
         input = [20,30,40]
         a=MoveStrategy(input, 'time')
-        b=Optimizer(input, 'time')
-        self.assertEqual(Optimizer.objective(input), a.objective_value)
+        b=Optimizer(input, obj='time')
+        self.assertEqual(b.objective(input, 'time'), a.objective_value)
