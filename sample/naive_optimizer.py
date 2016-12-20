@@ -28,7 +28,8 @@ class Optimizer:
              'fun': lambda x: np.array([x[1]])},
             {'type': 'ineq',
              'fun': lambda x: np.array([x[2]])},
-
+            {'type': 'ineq',
+             'fun': lambda x: np.array([-x[0]+183])},
             {'type': 'ineq',
              'fun': lambda x: np.array([x[2] - x[1]])}
             )
@@ -46,6 +47,6 @@ class Optimizer:
 
 
 if __name__ == "__main__":
-    input_initial = [80, 60, 70]
+    input_initial = [180, 160, 160]
     a = Optimizer(input_initial, 'time')
     a.print_results()

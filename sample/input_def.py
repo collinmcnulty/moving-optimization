@@ -16,6 +16,7 @@ class MoveStrategy:
         self.nparray=np.array([self.EL, self.SL, self.moving_time])
         self.const_max_rent=1600/30
         self.const_new_rent = 825/30
+        self.const_normal_rent = 1325 / 30
         if obj == 'tr':
             self.objective_function = self.time_ratio
         elif obj == 'time':
@@ -24,10 +25,17 @@ class MoveStrategy:
         self.find_money_lost()
         self.calculate_objective_value()
 
+
     def find_money_lost(self):
-        self.money = (self.EL*self.const_max_rent +
-        self.AR*self.const_max_rent*.85 +
-        self.const_new_rent * (183-self.SL)) -8082.5
+
+        if self.EL < 183 :
+            lease_penalty =  self.EL*self.const_max_rent
+        else:
+            lease_penalty = 183 * self.const_normal_rent
+
+        re_rent_fee = min(self.AR, 183-self.EL)*self.const_max_rent*.85
+        new_rent = self.const_new_rent * (183-self.SL)
+        self.money = lease_penalty + re_rent_fee + new_rent-8082.5
         return self.money
 
     @staticmethod
@@ -51,8 +59,11 @@ class MoveStrategy:
 
     def time_ratio(self):
         # Minimize time spent/money saved
-         objective = self.time / self.money
-         return objective
+        if self.money > 1:
+            self.time_ratio_val = self.time / self.money
+        else:
+            self.time_ratio_val = -100
+        return self.time_ratio_val
 
     def print_results(self):
         print("Days until lease end: {:.0f}".format(self.EL)),
@@ -60,9 +71,9 @@ class MoveStrategy:
         print("Days until move: {:.0f}".format(self.moving_time))
         print("Time Spent: {:.2f}".format(self.time))
         print("Money Spent: {:.2f}".format(self.money))
-        print("Time/Money: {:.2f}".format(self.time/self.money))
+        print("Time/Money: {:.2f}".format(self.time_ratio_val))
 
 if __name__ == "__main__":
-    input_initial = [60, 60, 60]
+    input_initial = [183, 183, 183]
     a = MoveStrategy(input_initial)
     a.print_results()
