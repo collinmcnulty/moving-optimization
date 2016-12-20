@@ -27,7 +27,7 @@ class MoveStrategy:
     def find_money_lost(self):
         self.money = (self.EL*self.const_max_rent +
         self.AR*self.const_max_rent*.85 +
-        self.const_new_rent * (183-self.SL))
+        self.const_new_rent * (183-self.SL)) -8082.5
         return self.money
 
     @staticmethod
@@ -63,6 +63,6 @@ class MoveStrategy:
         print("Time/Money: {:.2f}".format(self.time/self.money))
 
 if __name__ == "__main__":
-    input_initial = [183, 183, 183]
+    input_initial = [60, 60, 60]
     a = MoveStrategy(input_initial)
     a.print_results()
