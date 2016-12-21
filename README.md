@@ -3,9 +3,7 @@ title: Optimizing Housing under Lease Penalty
 ---
 
 Collin McNulty
-
-Introduction
-============
+==============
 
 Background
 ==========
@@ -23,6 +21,20 @@ The penalty is not a fixed amount, but rather is a function of when the lease is
 broken in the cycle and the time that it takes to re-rent the apartment.
 Therefore, it was not obvious to me what the optimal strategy is in order to
 maximize the time saved and minimize the additional expense incurred.
+
+The three variables to optimize are when we officially break the lease, when we
+begin a new lease, and when we physically move to the new location. We are
+required to give 60 days notice, but we can overlap leases if it proves to
+improve the cost/time tradeoff.
+
+A few fictionalizations have been introduced in the problem for the sake of the
+class. First, I considered that we can begin and break leases at any given day.
+In reality, only certain days are available for move-in and move-out. Also, all
+variables have been made continuous, while many of them are discrete by day or
+even by month. However, the shape of the problem is still preserved under these
+fictionalizations, and the insights are applicable to the real problem. I also
+considered a completely fictional version of the scenario that has a slightly
+more interesting optimization than the real scenario turned out to have.
 
 Original Problem Formulation
 ============================
@@ -55,7 +67,7 @@ Finally, all costs were converted from monthly costs to continuous time, to make
 the function differentiable and non-flat at all points.
 
 $$Cost = RetroactivePenalty + RerentFee + NewRent - Current\ Rent$$ (1)  
-$$\text{Retroa}ctivePenalty = \left( CurrentLeaseStart - LeaseEnd
+$$RetroactivePenalty = \left( CurrentLeaseStart - LeaseEnd
 \right)*PenalizedRent$$ (2)  
 $$ReRent\ Fee = MonthsUnrented*0.85*PenalizedRent$$ (3)  
 $$NewRent = \left( FinalDate - \ NewLeaseStart \right)*\$ 825/month$$ (4)
@@ -69,7 +81,7 @@ Thus, there are 3 design variables: *NewLeaseStart, LeaseEnd, and MoveDate*.
 
 Constants are shown in Table 1.
 
-Table 1: Constants
+Table : Constants
 
 | Current Lease Start          | June 1, 2016 (-182) |
 |------------------------------|---------------------|
@@ -117,7 +129,7 @@ answer. I also took several point estimates for reference. These points and the
 optimum are shown in Table 2. The code for this analysis is found in commit
 4ed1c84.
 
-Table 2: Values for Optimization of Original Formulation
+Table : Values for Optimization of Original Formulation
 
 | Lease End | New Lease | Move | Time Saved (minutes) | Housing Cost (\$) | Ratio |
 |-----------|-----------|------|----------------------|-------------------|-------|
@@ -136,7 +148,7 @@ to have two local optima, one corresponding to ending the lease early, and the
 other for not doing so. These local optima are shown below. Note that
 (183,183,183) now has an undefined ratio and thus objective function.
 
-Table 3: Values for Correct Handling of Lease Penalty
+Table : Values for Correct Handling of Lease Penalty
 
 | Lease End | New Lease | Move | Time Saved (minutes) | Housing Cost (\$) | Ratio     |
 |-----------|-----------|------|----------------------|-------------------|-----------|
@@ -212,8 +224,8 @@ function of the day on which the lease was broken, so the *Cost* would be a
 nonlinear function and would push the objective opposite the time savings.
 
 $$Cost = Penalty + New\ Rent$$ (10)  
-$$\text{Pena}lty = \ \sum_{1}^{183 - LeaseEnd}{(Penalty\lbrack day\rbrack)}\ \ \
-+ LeaseEnd\ mod\ 1*Penalty\ \lbrack last\ day\rbrack$$ (11)  
+$$Penalty = \ \sum_{1}^{183 - LeaseEnd}{(Penalty\lbrack day\rbrack)}\ \ \  +
+LeaseEnd\ mod\ 1*Penalty\ \lbrack last\ day\rbrack$$ (11)  
 $$\text{Penalty}\left\lbrack \text{day} \right\rbrack = \left( \frac{i}{183}
 \right)PenalizedRent - \left( 1 - \frac{i}{183} \right)\text{CurrentRent}$$ (12)
 
@@ -223,7 +235,7 @@ functions, which were found to confuse the solvers.
 The *Time Saved* was reformatted to reflect the differences in time savings
 based on the day of the week according to Table 4.
 
-Table 4: Time Savings Schedule
+Table : Time Savings Schedule
 
 | Sunday  | Monday  | Tuesday | Wednesday | Thursday | Friday  | Saturday |
 |---------|---------|---------|-----------|----------|---------|----------|
@@ -233,7 +245,7 @@ This schedule results in the following shape for *Time Saved:*
 
 ![](media/9f5369b057c93eef69d30c571a3c086b.png)
 
-Figure 1: Time Saved in New Formulation
+Figure : Time Saved in New Formulation
 
 This new formulation therefore has many local optima, and the surface is
 “bumpy”.
@@ -261,7 +273,7 @@ two points highlighted in blue are truly local optima satisfying KKT conditions.
 All the other points have a feasible direction of improvement towards a later
 date for lease end.
 
-Table 5: Local Optima for Reformulated Problem
+Table : Local Optima for Reformulated Problem
 
 | Lease End | New Lease | Move | Time Saved | Housing Cost | Ratio | Solver Used |
 |-----------|-----------|------|------------|--------------|-------|-------------|
@@ -276,8 +288,8 @@ Verification
 
 The value for the global optimum makes sense as it exploits the direction and
 non-linearity of both objective components to the maximum degree possible. It
-suggests that penalties can be avoided and a little extra time can be saved by
-moving out a little early. It also highlights a weakness in the model, as in
+suggests that penalties can be avoided and that a little extra time can be saved
+by moving out a little early. It also highlights a weakness in the model, as in
 order to get this most favorable tradeoff rate, one must trade only a little.
 However, if a ratio of 0.55 was still “worth it”, one could make that trade in a
 much higher volume. The pareto frontier in the original objective space is (183,
@@ -308,9 +320,183 @@ that simplicity enabled me to see that the core problem did not need to have
 much of its uncertainty modelled, even though that uncertainty is part of why I
 felt advanced techniques were needed to solve the problem. I was thus able to
 use off-the-shelf solvers and still gain a solid understanding of the problem’s
-dynamics. (I wish I had gotten reason to demonstrate comparisons of more
-advanced techniques for purposes of the project originality and difficulty
-requirement, but the problem simply didn’t lend itself to that.)
+dynamics.
+
+(I wish I had gotten reason to demonstrate comparisons of more advanced
+techniques for purposes of the project originality and difficulty requirement,
+but the problem simply didn’t lend itself to that, despite my original
+confidence that it would)
 
 Appendix
 ========
+
+Formulation of Constraints
+--------------------------
+
+Equations 6-9 are presented in the most human readable form. The canonical
+version of each, which is used in the code, is always of the form: Constraint \>
+0 with the necessary algebra performed to be consistent with Equations 6-9.
+
+Code
+----
+
+The optimal place to view the code is my GitHub repository. There, you can see
+every version of the code and can reference the commits in which certain results
+are taken from. I am also showing the text of the core files below
+
+Github repository: <https://github.com/collinmcnulty/moving-optimization>
+
+### Naïve-Optimizer.py
+
+*\# -\*- coding: utf-8 -\*-*  
+*"""*  
+*Created on Sat Dec 10 10:54:30 2016*  
+  
+*\@author: Collin*  
+*"""*  
+  
+**import** numpy **as** np  
+**import** scipy.optimize **as** optimize  
+**from** sample.input\_def **import** MoveStrategy  
+  
+  
+**class** Optimizer:  
+\@staticmethod  
+**def** objective(input\_list, obj=**'tr'**):  
+point = MoveStrategy(input\_list)  
+**return** point.objective\_value  
+  
+**def** \_\_init\_\_(self, list, obj=**'tr'**):  
+self.initial\_point = MoveStrategy(list, obj)  
+self.cons = (  
+{**'type'**: **'ineq'**,  
+**'fun'**: **lambda** x: np.array([x[0] - x[1]]),  
+},  
+{**'type'**: **'ineq'**,  
+**'fun'**: **lambda** x: np.array([x[0] - 60])},  
+{**'type'**: **'ineq'**,  
+**'fun'**: **lambda** x: np.array([x[1]])},  
+{**'type'**: **'ineq'**,  
+**'fun'**: **lambda** x: np.array([x[2]])},  
+{**'type'**: **'ineq'**,  
+**'fun'**: **lambda** x: np.array([-x[0]+183])},  
+{**'type'**: **'ineq'**,  
+**'fun'**: **lambda** x: np.array([x[2] - x[1]])},  
+{**'type'**: **'ineq'**,  
+**'fun'**: **lambda** x: np.array([x[0] - x[2]])}  
+)  
+self.optimize\_result = optimize.minimize(Optimizer.objective, list,
+args=(obj,), constraints=self.cons,  
+method=**'slsqp'**, options={**'disp'**: **False**})  
+self.final\_point = MoveStrategy(self.optimize\_result.x)  
+  
+**def** print\_results(self):  
+print(**"Days until lease end: {:.0f}"**.format(self.optimize\_result.x[0])),  
+print(**"Days until new lease: {:.0f}"**.format(self.optimize\_result.x[1]))  
+print(**"Days until move: {:.0f}"**.format(self.optimize\_result.x[2]))  
+print(**"Time Spent: {:.2f}"**.format(self.final\_point.time))  
+print(**"Money Spent: {:.2f}"**.format(self.final\_point.money))  
+print(**"Time/Money: {:.2f}"**.format(self.optimize\_result.fun))  
+  
+  
+**if** \_\_name\_\_ == **"\_\_main\_\_"**:  
+input\_initial = [183, 180, 180]  
+a = Optimizer(input\_initial, **'time'**)  
+a.print\_results()
+
+### Input-Def.py
+
+*\# -\*- coding: utf-8 -\*-*  
+*"""*  
+*Created on Sat Dec 10 14:00:52 2016*  
+  
+*\@author: Collin*  
+*"""*  
+**import** numpy **as** np  
+  
+  
+**class** MoveStrategy:  
+**def** \_\_init\_\_(self, list, obj=**'tr'**):  
+self.EL = list[0]  
+self.SL = list[1]  
+self.moving\_time = list[2]  
+self.AR = 45  
+self.nparray = np.array([self.EL, self.SL, self.moving\_time])  
+self.const\_max\_rent = 1600 / 30  
+self.const\_new\_rent = 825 / 30  
+self.const\_normal\_rent = 1325 / 30  
+**if** obj == **'tr'**:  
+self.objective\_function = self.time\_ratio  
+**elif** obj == **'time'**:  
+self.objective\_function = self.time\_ratio  
+self.find\_time\_spent()  
+self.find\_money\_lost()  
+self.calculate\_objective\_value()  
+  
+**def** find\_money\_lost(self):  
+days\_abandoned = 183. - self.EL  
+whole\_days\_abandoned = int(days\_abandoned - (days\_abandoned % 1))  
+dec1penalty = (1600 - 1325) \* 182 / 365 + 1325  
+money = 0  
+**for** i **in** range(whole\_days\_abandoned + 1):  
+**if** i == whole\_days\_abandoned:  
+last\_day = (days\_abandoned % 1)\*\*2 \* (  
+i / 183 \* dec1penalty + ((1 - i) / 183) \* 1325) / 30 *\# Makes function
+continuous*  
+money += last\_day  
+**else**:  
+money += (i / 183 \* dec1penalty + ((1 - i) / 183) \* 1325) / 30  
+new\_rent = self.const\_new\_rent \* (183 - self.SL)  
+self.money = new\_rent + money  
+**return** self.money  
+  
+\@staticmethod  
+**def** calculate\_commute(move\_date):  
+days\_in\_new\_crib = 183 - move\_date  
+whole\_days\_in\_new\_crib = int(days\_in\_new\_crib - days\_in\_new\_crib % 1)  
+time = 0  
+**for** i **in** range(whole\_days\_in\_new\_crib + 1):  
+**if** i == whole\_days\_in\_new\_crib:  
+mod = days\_in\_new\_crib - whole\_days\_in\_new\_crib  
+**else**:  
+mod = 1  
+weekday = i % 7  
+**if** weekday **in** [0, 1, 5, 6]: *\# Thursday, Fri, Tues, Wed*  
+time -= 20 \* mod  
+**elif** weekday **in** [2, 3]:  
+time -= 25 \* mod  
+**else**:  
+time += 25 \* mod  
+**return** time  
+  
+*\# TODO make commute times a probability distribution*  
+  
+**def** find\_time\_spent(self):  
+self.time = self.calculate\_commute(self.moving\_time)  
+**return** self.time  
+  
+**def** calculate\_objective\_value(self):  
+self.objective\_value = self.objective\_function()  
+**return** self.objective\_value  
+  
+**def** time\_ratio(self):  
+*\# Minimize time spent/money saved*  
+**if** self.money \> 1:  
+self.time\_ratio\_val = self.time / self.money  
+**else**:  
+self.time\_ratio\_val = -100  
+**return** self.time\_ratio\_val  
+  
+**def** print\_results(self):  
+print(**"Days until lease end: {:.0f}"**.format(self.EL)),  
+print(**"Days until new lease: {:.0f}"**.format(self.SL))  
+print(**"Days until move: {:.0f}"**.format(self.moving\_time))  
+print(**"Time Spent: {:.2f}"**.format(self.time))  
+print(**"Money Spent: {:.2f}"**.format(self.money))  
+print(**"Time/Money: {:.2f}"**.format(self.time\_ratio\_val))  
+  
+  
+**if** \_\_name\_\_ == **"\_\_main\_\_"**:  
+input\_initial = [183, 182, 182]  
+a = MoveStrategy(input\_initial)  
+a.print\_results()
