@@ -49,6 +49,6 @@ class Optimizer:
 
 
 if __name__ == "__main__":
-    input_initial = [170, 70, 171 ]
+    input_initial = [183, 180, 180]
     a = Optimizer(input_initial, 'time')
     a.print_results()
