@@ -31,10 +31,12 @@ class Optimizer:
             {'type': 'ineq',
              'fun': lambda x: np.array([-x[0]+183])},
             {'type': 'ineq',
-             'fun': lambda x: np.array([x[2] - x[1]])}
+             'fun': lambda x: np.array([x[2] - x[1]])},
+            {'type': 'ineq',
+             'fun': lambda x: np.array([x[0] - x[2]])}
             )
         self.optimize_result = optimize.minimize(Optimizer.objective, list, args=(obj,), constraints=self.cons,
-                                                 method='cobyla', options={'disp': False})
+                                                 method='slsqp', options={'disp': False})
         self.final_point = MoveStrategy(self.optimize_result.x)
 
     def print_results(self):
@@ -47,6 +49,6 @@ class Optimizer:
 
 
 if __name__ == "__main__":
-    input_initial = [180, 160, 160]
+    input_initial = [170, 70, 171 ]
     a = Optimizer(input_initial, 'time')
     a.print_results()

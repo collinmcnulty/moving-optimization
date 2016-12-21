@@ -20,36 +20,41 @@ class MoveStrategy:
         if obj == 'tr':
             self.objective_function = self.time_ratio
         elif obj == 'time':
-            self.objective_function = self.find_time_spent
+            self.objective_function = self.time_ratio
         self.find_time_spent()
         self.find_money_lost()
         self.calculate_objective_value()
 
 
     def find_money_lost(self):
-
-        if self.EL < 183 :
-            lease_penalty =  self.EL*self.const_max_rent
-        else:
-            lease_penalty = 183 * self.const_normal_rent
-
-        re_rent_fee = min(self.AR, 183-self.EL)*self.const_max_rent*.85
-        new_rent = self.const_new_rent * (183-self.SL)
-        self.money = lease_penalty + re_rent_fee + new_rent-8082.5
+        days_abandoned = 183 -self.EL
+        days_abandoned = int(days_abandoned - (days_abandoned%1))
+        dec1penalty = (1600-1325)*182/183 + 1325
+        money = 0
+        for i in range(days_abandoned):
+            money += (i/183*dec1penalty + (1-i/183)*1325)/30
+        new_rent = self.const_new_rent*(183-self.SL)
+        self.money = new_rent + money
         return self.money
 
     @staticmethod
     def calculate_commute(move_date):
-        days = 183 - move_date
-        time_per_day = (20 * 7 + 25 + 25) / 7
-        time = days * time_per_day
+        days_in_new_crib = 183 - move_date
+        time = 0
+        for i in range(int(days_in_new_crib - days_in_new_crib%1)):
+            weekday = i%7
+            if weekday in [0,1,5,6]: # Thursday, Fri, Tues, Wed
+                time -= 20
+            elif weekday in [2,3]:
+                time -= 25
+            else:
+                time += 25
         return time
-        # TODO make this reflect actual weekdays
 
         # TODO make commute times a probability distribution
 
     def find_time_spent(self):
-        self.time =  -self.calculate_commute(self.moving_time)
+        self.time = self.calculate_commute(self.moving_time)
         return self.time
 
     def calculate_objective_value(self):
@@ -74,6 +79,6 @@ class MoveStrategy:
         print("Time/Money: {:.2f}".format(self.time_ratio_val))
 
 if __name__ == "__main__":
-    input_initial = [183, 183, 183]
+    input_initial = [69, 80, 90]
     a = MoveStrategy(input_initial)
     a.print_results()
